@@ -8,12 +8,12 @@ import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public class userData {
+public class UserData {
 	private Connection connection;
 	private PreparedStatement addRecord, getRecords, getUser;
 	private String errorMessage = "";
 
-	public userData() throws Exception {
+	public UserData() throws Exception {
 
 		try {
 			Class.forName("com.mysql.jdbc.Driver");
@@ -33,15 +33,15 @@ public class userData {
 
 	}
 
-	public List<user> getUsersList() throws SQLException {
-		List<user> userList = new ArrayList<user>();
+	public List<User> getUsersList() throws SQLException {
+		List<User> userList = new ArrayList<User>();
 
 		// obtain list of titles
 		ResultSet results = getRecords.executeQuery();
 
 		// get row data
 		while (results.next()) {
-			user myUser = new user();
+			User myUser = new User();
 			
 			myUser.setId(Integer.parseInt(results.getString(1)));
 			myUser.setLogin(results.getString(2));
@@ -53,17 +53,17 @@ public class userData {
 		return userList;
 	}
 
-	public void addUser(user myUser) throws SQLException{
+	public void addUser(User myUser) throws SQLException{
 	    	addRecord.setString(1, myUser.getLogin());
 	  		addRecord.setString(2, myUser.getPwd());
 	  		addRecord.executeUpdate();
 	}
 	
-	public user getUser(String login) throws SQLException{
+	public User getUser(String login) throws SQLException{
 		getUser.setString(1, login);
 		ResultSet result = getUser.executeQuery();
 		
-		user myUser = new user();
+		User myUser = new User();
 				
 		if(result.next()){
 			myUser.setId(Integer.parseInt(result.getString(1)));

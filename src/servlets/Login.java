@@ -9,13 +9,13 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
-import beans.user;
-import beans.userData;
+import beans.User;
+import beans.UserData;
 
 /**
  * Servlet implementation class login
  */
-public class login extends HttpServlet {
+public class Login extends HttpServlet {
 	private static final long serialVersionUID = 1L;
        
 	private String errorMessage = "";
@@ -23,7 +23,7 @@ public class login extends HttpServlet {
     /**
      * @see HttpServlet#HttpServlet()
      */
-    public login() {
+    public Login() {
         super();
         // TODO Auto-generated constructor stub
     }
@@ -46,9 +46,9 @@ public class login extends HttpServlet {
 		if(login == null || pwd == null){
 			this.getServletContext().getRequestDispatcher("/userLogin.jsp").forward(request, response);
 		}else{
-			user myUser = new user();
+			User myUser = new User();
 			try {
-				userData userD = new userData();
+				UserData userD = new UserData();
 				myUser = userD.getUser(login);
 				
 				if(myUser != null && myUser.getLogin() != null){

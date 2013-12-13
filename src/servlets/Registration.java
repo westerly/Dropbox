@@ -13,13 +13,13 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
-import beans.user;
-import beans.userData;
+import beans.User;
+import beans.UserData;
 
 /**
  * Servlet implementation class registration
  */
-public class registration extends HttpServlet {
+public class Registration extends HttpServlet {
 	private static final long serialVersionUID = 1L;
 	
 	private String errorMessage = "";
@@ -27,7 +27,7 @@ public class registration extends HttpServlet {
     /**
      * @see HttpServlet#HttpServlet()
      */
-    public registration() {
+    public Registration() {
         super();
         // TODO Auto-generated constructor stub
     }
@@ -70,7 +70,7 @@ public class registration extends HttpServlet {
 				      
 				      if(this.errorMessage.isEmpty()){
 				    	 
-				    	user myUser = new user();
+				    	User myUser = new User();
 				    	myUser.setLogin(login);
 				    	
 				    	// Encode password in md5
@@ -85,9 +85,9 @@ public class registration extends HttpServlet {
 						        sb.append(Integer.toString((byteData[i] & 0xff) + 0x100, 16).substring(1));
 						    
 					    	myUser.setPwd(sb.toString());
-					    	userData userD;
+					    	UserData userD;
 							try {
-								userD = new userData();
+								userD = new UserData();
 								try {
 									userD.addUser(myUser);
 									// Create a session for the new registered user
