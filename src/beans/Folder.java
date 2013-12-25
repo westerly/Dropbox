@@ -3,8 +3,15 @@ package beans;
 import java.util.LinkedList;
 import java.util.List;
 
-public class Folder {
+public class Folder implements java.io.Serializable {
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 8523527838115892735L;
+	private int id;
 	private String folderName;
+	private String name_space_parent;
+	private int id_folder_parent;
 	private Byte size;
 	private Integer numberOfFiles;
 	private Integer spaceId;
@@ -169,6 +176,30 @@ public class Folder {
 		return "Folder [folderName=" + folderName + ", size=" + size
 				+ ", numberOfFiles=" + numberOfFiles + ", spaceId=" + spaceId
 				+ ", folderId=" + folderId + ", files=" + files + "]";
+	}
+
+	public int getId() {
+		return id;
+	}
+
+	public void setId(int id) {
+		this.id = id;
+	}
+
+	public String getName_space_parent() {
+		return name_space_parent;
+	}
+
+	public void setName_space_parent(String name_space_parent) {
+		this.name_space_parent = name_space_parent;
+	}
+
+	public int getId_folder_parent() {
+		return id_folder_parent;
+	}
+
+	public void setId_folder_parent(int id_folder_parent) {
+		this.id_folder_parent = id_folder_parent;
 	}
 
 }

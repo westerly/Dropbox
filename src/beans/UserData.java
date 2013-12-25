@@ -1,31 +1,29 @@
 package beans;
 
-import java.io.UnsupportedEncodingException;
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
+
 import java.sql.*;
 import java.util.*;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
+import Configuration.Configuration;
 
 public class UserData {
 	private Connection connection;
-	private PreparedStatement addRecord, getRecords, getUser;
-	private String errorMessage = "";
+	private PreparedStatement addRecord, getRecords, getUser, getNameSpace;
 
 	public UserData() throws Exception {
 
 		try {
 			Class.forName("com.mysql.jdbc.Driver");
 			connection = DriverManager.getConnection(
-					"jdbc:mysql://localhost:3306/Dropbox", "root",
-					"");
+					Configuration.HOST_DB, Configuration.USER_DB,
+					Configuration.MDP_DB);
 
 			getRecords = connection.prepareStatement("SELECT * FROM users");
 
 			addRecord = connection.prepareStatement("INSERT INTO users (login, pwd) " + "VALUES (?, ?)");
 			
 			getUser = connection.prepareStatement("SELECT id, login, pwd from users WHERE login = ? ");
+			
+			getNameSpace = connection.prepareStatement("SELECT name from spaces WHERE owner = ? ");
 
 		} catch (SQLException sqle) {
 			sqle.printStackTrace();
@@ -71,6 +69,12 @@ public class UserData {
 			myUser.setPwd(result.getString(3));
 		}
 		
+		getNameSpace.setInt(1, myUser.getId());
+		result = getNameSpace.executeQuery();
+		if(result.next()){
+			myUser.setNameSpace(result.getString(1));
+		}
+		
 		return myUser;
 		
 	}
@@ -85,8 +89,5 @@ public class UserData {
 		}
 	}
 	
-	public String getErrorMessage(){
-		return this.errorMessage;
-	}
 
 }

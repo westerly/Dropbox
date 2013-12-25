@@ -3,11 +3,14 @@ package beans;
 import java.util.LinkedList;
 import java.util.List;
 
-public class Space {
+public class Space implements java.io.Serializable {
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = -2869911833463935177L;
 	private String spaceName;
 	private Byte size;
 	private Integer ownerId;
-	private Integer spaceId;
 	private List<User> usersAllowsToRead = new LinkedList<User>();
 	private List<Rights> rights;
 
@@ -22,7 +25,6 @@ public class Space {
 		this.spaceName = spaceName;
 		this.size = size;
 		this.ownerId = ownerId;
-		this.spaceId = spaceId;
 		this.usersAllowsToRead = usersAllowsToRead;
 		this.rights = rights;
 	}
@@ -51,13 +53,6 @@ public class Space {
 		this.ownerId = ownerId;
 	}
 
-	public Integer getSpaceId() {
-		return spaceId;
-	}
-
-	public void setSpaceId(Integer spaceId) {
-		this.spaceId = spaceId;
-	}
 
 	public List<User> getUsersAllowsToRead() {
 		return usersAllowsToRead;
@@ -79,9 +74,9 @@ public class Space {
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
-		result = prime * result + ((spaceId == null) ? 0 : spaceId.hashCode());
 		result = prime * result
 				+ ((spaceName == null) ? 0 : spaceName.hashCode());
+		result = prime * result + ownerId;
 		return result;
 	}
 
@@ -97,13 +92,6 @@ public class Space {
 			return false;
 		}
 		Space other = (Space) obj;
-		if (spaceId == null) {
-			if (other.spaceId != null) {
-				return false;
-			}
-		} else if (!spaceId.equals(other.spaceId)) {
-			return false;
-		}
 		if (spaceName == null) {
 			if (other.spaceName != null) {
 				return false;
@@ -111,14 +99,14 @@ public class Space {
 		} else if (!spaceName.equals(other.spaceName)) {
 			return false;
 		}
+
 		return true;
 	}
 
 	@Override
 	public String toString() {
 		return "Space [spaceName=" + spaceName + ", size=" + size
-				+ ", ownerId=" + ownerId + ", spaceId=" + spaceId
-				+ ", usersAllowsToRead=" + usersAllowsToRead + ", rights="
+				+ ", ownerId=" + ownerId + ", usersAllowsToRead=" + usersAllowsToRead + ", rights="
 				+ rights + "]";
 	}
 

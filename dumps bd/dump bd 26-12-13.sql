@@ -1,11 +1,11 @@
 -- phpMyAdmin SQL Dump
--- version 3.5.1
+-- version 4.0.4
 -- http://www.phpmyadmin.net
 --
 -- Client: localhost
--- Généré le: Lun 02 Décembre 2013 à 16:23
--- Version du serveur: 5.5.24-log
--- Version de PHP: 5.3.13
+-- Généré le: Mer 25 Décembre 2013 à 13:53
+-- Version du serveur: 5.6.12-log
+-- Version de PHP: 5.4.12
 
 SET FOREIGN_KEY_CHECKS=0;
 SET SQL_MODE="NO_AUTO_VALUE_ON_ZERO";
@@ -20,6 +20,8 @@ SET time_zone = "+00:00";
 --
 -- Base de données: `dropbox`
 --
+CREATE DATABASE IF NOT EXISTS `dropbox` DEFAULT CHARACTER SET utf8 COLLATE utf8_general_ci;
+USE `dropbox`;
 
 -- --------------------------------------------------------
 
@@ -27,15 +29,15 @@ SET time_zone = "+00:00";
 -- Structure de la table `files`
 --
 
-
-
-
 DROP TABLE IF EXISTS `files`;
 CREATE TABLE IF NOT EXISTS `files` (
+   `id` int(11) NOT NULL AUTO_INCREMENT,
   `name` varchar(100) NOT NULL,
-  `id_folder` int(11) NOT NULL,
-  PRIMARY KEY (`name`),
-  KEY `id_folder` (`id_folder`)
+  `id_folder_parent` int(11),
+  `name_space_parent` varchar(50),
+  PRIMARY KEY (`id`),
+  KEY `id_folder_parent` (`id_folder_parent`),
+  KEY `name_space_parent` (`name_space_parent`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 -- --------------------------------------------------------
@@ -46,11 +48,28 @@ CREATE TABLE IF NOT EXISTS `files` (
 
 DROP TABLE IF EXISTS `file_tag`;
 CREATE TABLE IF NOT EXISTS `file_tag` (
-  `filename` varchar(100) NOT NULL DEFAULT '',
+  `IdFile` int(11) NOT NULL,
   `tagname` varchar(50) NOT NULL DEFAULT '',
-  PRIMARY KEY (`filename`,`tagname`),
+  PRIMARY KEY (`IdFile`,`tagname`),
   KEY `tagname` (`tagname`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+-- --------------------------------------------------------
+
+--
+-- Structure de la table `folders`
+--
+
+DROP TABLE IF EXISTS `folders`;
+CREATE TABLE IF NOT EXISTS `folders` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `name` varchar(100) NOT NULL,
+  `name_space_parent` varchar(30),
+  id_folder_parent int(11),
+  PRIMARY KEY (`id`),
+  KEY `name_space_parent` (`name_space_parent`),
+  KEY `id_folder_parent` (`id_folder_parent`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
 
 -- --------------------------------------------------------
 
@@ -61,7 +80,7 @@ CREATE TABLE IF NOT EXISTS `file_tag` (
 DROP TABLE IF EXISTS `rights_read`;
 CREATE TABLE IF NOT EXISTS `rights_read` (
   `id_user` int(11) NOT NULL DEFAULT '0',
-  `name_space` VARCHAR(30) NOT NULL,
+  `name_space` varchar(30) NOT NULL,
   PRIMARY KEY (`id_user`,`name_space`),
   KEY `name_space` (`name_space`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
@@ -74,21 +93,18 @@ CREATE TABLE IF NOT EXISTS `rights_read` (
 
 DROP TABLE IF EXISTS `spaces`;
 CREATE TABLE IF NOT EXISTS `spaces` (
-  name VARCHAR(30),
-  `size` float NOT NULL,
+  `name` varchar(30) NOT NULL DEFAULT '',
   `owner` int(11) NOT NULL,
   PRIMARY KEY (`name`),
   KEY `owner` (`owner`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
-
-
-DROP TABLE IF EXISTS `folders`;
-CREATE TABLE IF NOT EXISTS `folders` (
-  id int(11) NOT NULL AUTO_INCREMENT,
-  `name_space` VARCHAR(30) NOT NULL,
-  PRIMARY KEY (`id`),
-  KEY `name_space` (`name_space`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+--
+-- Contenu de la table `spaces`
+--
+
+INSERT INTO `spaces` (`name`, `owner`) VALUES
+('thespacenametest', 16);
 
 -- --------------------------------------------------------
 
@@ -115,14 +131,17 @@ CREATE TABLE IF NOT EXISTS `users` (
   `pwd` varchar(32) NOT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `login` (`login`,`pwd`)
-) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=13 ;
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=17 ;
 
 --
 -- Contenu de la table `users`
 --
 
-INSERT INTO `users` (`id`, `login`, `pwd`) VALUES(12, 'login', 'd56b699830e77ba53855679cb1d252da');
-INSERT INTO `users` (`id`, `login`, `pwd`) VALUES(11, 'test', '098f6bcd4621d373cade4e832627b4f6');
+INSERT INTO `users` (`id`, `login`, `pwd`) VALUES
+(15, 'login', '73f744fe95eaca16b7ca24558ee61983'),
+(16, 'newlogin', '330cf47b6adba82f100bb1f833f8ef7b'),
+(11, 'test', '098f6bcd4621d373cade4e832627b4f6'),
+(14, 'testezfef', 'f472e934715eae41e439ef3818ef7a2b');
 
 --
 -- Contraintes pour les tables exportées
@@ -132,33 +151,44 @@ INSERT INTO `users` (`id`, `login`, `pwd`) VALUES(11, 'test', '098f6bcd4621d373c
 -- Contraintes pour la table `files`
 --
 ALTER TABLE `files`
-  ADD CONSTRAINT `files_ibfk_1` FOREIGN KEY (`id_folder`) REFERENCES `folders` (`id`);
+  ADD CONSTRAINT `files_ibfk_1` FOREIGN KEY (`id_folder_parent`) REFERENCES `folders` (`id`);
   
+ALTER TABLE `files`
+  ADD CONSTRAINT `files_ibfk_2` FOREIGN KEY (`name_space_parent`) REFERENCES `spaces` (`name`);
   
-ALTER TABLE `folders`
-  ADD CONSTRAINT `files_fofk_1` FOREIGN KEY (`name_space`) REFERENCES `spaces` (`name`);
 
 --
 -- Contraintes pour la table `file_tag`
 --
 ALTER TABLE `file_tag`
-  ADD CONSTRAINT `file_tag_ibfk_1` FOREIGN KEY (`filename`) REFERENCES `files` (`name`),
+  ADD CONSTRAINT `file_tag_ibfk_1` FOREIGN KEY (`IdFile`) REFERENCES `files` (`id`),
   ADD CONSTRAINT `file_tag_ibfk_2` FOREIGN KEY (`tagname`) REFERENCES `tags` (`name`);
+
+--
+-- Contraintes pour la table `folders`
+--
+ALTER TABLE `folders`
+  ADD CONSTRAINT `files_fofk_1` FOREIGN KEY (`name_space_parent`) REFERENCES `spaces` (`name`);
+  
+ALTER TABLE `folders`
+  ADD CONSTRAINT `files_fofk_2` FOREIGN KEY (`id_folder_parent`) REFERENCES `folders` (`id`);
+  
 
 --
 -- Contraintes pour la table `rights_read`
 --
 ALTER TABLE `rights_read`
-  ADD CONSTRAINT `rights_read_ibfk_3` FOREIGN KEY (`name_space`) REFERENCES `spaces` (`name`),
-  ADD CONSTRAINT `rights_read_ibfk_1` FOREIGN KEY (`id_user`) REFERENCES `users` (`id`);
+  ADD CONSTRAINT `rights_read_ibfk_1` FOREIGN KEY (`id_user`) REFERENCES `users` (`id`),
+  ADD CONSTRAINT `rights_read_ibfk_3` FOREIGN KEY (`name_space`) REFERENCES `spaces` (`name`);
 
 --
 -- Contraintes pour la table `spaces`
 --
 ALTER TABLE `spaces`
   ADD CONSTRAINT `spaces_ibfk_1` FOREIGN KEY (`owner`) REFERENCES `users` (`id`);
+  
 SET FOREIGN_KEY_CHECKS=1;
-
+  
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
 /*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;

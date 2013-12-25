@@ -9,28 +9,28 @@ public class User implements java.io.Serializable {
 	private int id;
 	private String login;
 	private String pwd;
-	private int spaceId;
+	private String nameSpace;
 	private List<Integer> spacesAvalibles = new LinkedList<Integer>();
 
 	public User() {
 	}
 
-	public User(int id, String login, String pwd, int spaceId,
+	public User(int id, String login, String pwd, String nameSpace,
 			List<Integer> spacesAvalibles) {
 		super();
 		this.id = id;
 		this.login = login;
 		this.pwd = pwd;
-		this.spaceId = spaceId;
+		this.nameSpace = nameSpace;
 		this.spacesAvalibles = spacesAvalibles;
 	}
 
-	public int getSpaceId() {
-		return spaceId;
+	public String getNameSpace() {
+		return nameSpace;
 	}
 
-	public void setSpaceId(int spaceId) {
-		this.spaceId = spaceId;
+	public void setNameSpace(String nameSpace) {
+		this.nameSpace = nameSpace;
 	}
 
 	public List<Integer> getspacesAvalibles() {
@@ -104,7 +104,7 @@ public class User implements java.io.Serializable {
 	@Override
 	public String toString() {
 		return "User [id=" + id + ", login=" + login + ", pwd=" + pwd
-				+ ", spaceId=" + spaceId + ", spacesAvalibles="
+				+ ", nameSpace=" + this.nameSpace + ", spacesAvalibles="
 				+ spacesAvalibles + "]";
 	}
 	

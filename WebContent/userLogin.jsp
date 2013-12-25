@@ -42,7 +42,7 @@
       if ( request.getAttribute("errorMessage") == null ) {
     	  
    %> <%-- end scriptlet to insert fixed template data --%>
-        <form method = "post" action = "./login">
+        <form method = "post" action = "./Login">
             <p>Enter your login and your password.</p>
             <table>
                <tr>
@@ -76,7 +76,7 @@
       }  // end if
       else {
         %>
-        	 <form method = "post" action = "./login">
+        	 <form method = "post" action = "./Login">
 	            <p>Enter your login and your password.</p>
 		            <table>
 		               <tr>
@@ -105,7 +105,7 @@
         	 <p class = "errorMessage"><%out.println(request.getAttribute("errorMessage"));%></p><%
          } %>
 
-		
+		Not registered ? <a href="./userRegister.jsp" target="_blank">Create an account.</a>
 </body>
 
 </html>
