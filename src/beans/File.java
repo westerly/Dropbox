@@ -10,7 +10,7 @@ public class File implements java.io.Serializable {
 	private static final long serialVersionUID = -529994213106061035L;
 	private int Id;
 	private String fileName;
-	private int id_folder_parent;
+	private Integer id_folder_parent;
 	private String name_space_parent;
 	private Byte size;
 	private Integer folderId;
@@ -128,11 +128,11 @@ public class File implements java.io.Serializable {
 		Id = id;
 	}
 
-	public int getId_folder_parent() {
+	public Integer getId_folder_parent() {
 		return id_folder_parent;
 	}
 
-	public void setId_folder_parent(int id_folder_parent) {
+	public void setId_folder_parent(Integer id_folder_parent) {
 		this.id_folder_parent = id_folder_parent;
 	}
 

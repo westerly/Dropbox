@@ -37,10 +37,12 @@ public class Space extends HttpServlet {
 		User userCo = (User)request.getSession().getAttribute("user");
 		
 		// Return list of direct parents (files and folders) of the space
-		if(request.getAttribute("parentFolderId") == null){
+		if(request.getParameter("parentFolderId") == null){
 			try {
-				resultFiles = Controler.getDirectParentsFilesOfNameSpace(userCo.getNameSpace());
-				request.setAttribute("parentFiles", resultFiles);
+				resultFiles = Controler.getDirectFilesOfParentNameSpace(userCo.getNameSpace());
+				resultFolders = Controler.getDirectFoldersOfParentNameSpace(userCo.getNameSpace());
+				request.setAttribute("folders", resultFolders);
+				request.setAttribute("files", resultFiles);
 			} catch (Exception e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
@@ -50,6 +52,19 @@ public class Space extends HttpServlet {
 			
 		}else{
 			// Return list of direct parents of the folder with the id set in parentFolderId
+			try {
+				resultFiles = Controler.getDirectFilesOfParentFolder(Integer.parseInt(request.getParameter("parentFolderId")));
+				resultFolders = Controler.getDirectFoldersOfParentFolder(Integer.parseInt(request.getParameter("parentFolderId")));
+				request.setAttribute("folders", resultFolders);
+				request.setAttribute("files", resultFiles);
+			} catch (NumberFormatException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (Exception e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			
 		}
 		
 	}
@@ -59,6 +74,41 @@ public class Space extends HttpServlet {
 	 */
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		// TODO Auto-generated method stub
+		
+		ArrayList resultFiles;
+		ArrayList resultFolders;
+		User userCo = (User)request.getSession().getAttribute("user");
+		
+		// Return list of direct parents (files and folders) of the space
+		if(request.getParameter("parentFolderId") == null){
+			try {
+				resultFiles = Controler.getDirectFilesOfParentNameSpace(userCo.getNameSpace());
+				resultFolders = Controler.getDirectFoldersOfParentNameSpace(userCo.getNameSpace());
+				request.setAttribute("folders", resultFolders);
+				request.setAttribute("files", resultFiles);
+			} catch (Exception e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			
+			//resultFiles = Controler.getDirectParentsFoldersOfNameSpace(userCo.getNameSpace());
+			
+		}else{
+			// Return list of direct parents of the folder with the id set in parentFolderId
+			try {
+				resultFiles = Controler.getDirectFilesOfParentFolder(Integer.parseInt(request.getParameter("parentFolderId")));
+				resultFolders = Controler.getDirectFoldersOfParentFolder(Integer.parseInt(request.getParameter("parentFolderId")));
+				request.setAttribute("folders", resultFolders);
+				request.setAttribute("files", resultFiles);
+			} catch (NumberFormatException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (Exception e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			
+		}
 	}
 
 }

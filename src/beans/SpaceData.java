@@ -11,7 +11,8 @@ import Configuration.Configuration;
 
 public class SpaceData {
 	private Connection connection;
-	private PreparedStatement getRecordBySpaceName, addRecord, getParentsFiles, getParentsFolders;
+	private PreparedStatement getRecordBySpaceName, addRecord, getParentsFilesFromNameSpace, getParentsFoldersFromNameSpace
+	, getParentsFilesFromFolder, getParentFoldersFromFile, getFolder;
 
 	public SpaceData() throws Exception {
 
@@ -26,9 +27,13 @@ public class SpaceData {
 
 			addRecord = connection.prepareStatement("INSERT INTO spaces (name, owner) " + "VALUES (?, ?)");
 			
-			getParentsFiles = connection.prepareStatement("SELECT * FROM `files` WHERE name_space_parent = ? ");
-			getParentsFolders = connection.prepareStatement("SELECT * FROM `folders` WHERE name_space_parent = ? ");
+			getParentsFilesFromNameSpace = connection.prepareStatement("SELECT * FROM `files` WHERE name_space_parent = ? ");
+			getParentsFoldersFromNameSpace = connection.prepareStatement("SELECT * FROM `folders` WHERE name_space_parent = ? ");
+			
+			getParentsFilesFromFolder = connection.prepareStatement("SELECT * FROM `files` WHERE id_folder_parent = ? ");
+			getParentFoldersFromFile = connection.prepareStatement("SELECT * FROM `folders` WHERE id_folder_parent = ? ");
 					
+			getFolder = connection.prepareStatement("SELECT * FROM `folders` WHERE id = ? ");
 
 
 		} catch (SQLException sqle) {
@@ -58,14 +63,15 @@ public class SpaceData {
 	}
 	
 	public ArrayList getDirectParentsFiles(String nameSpace) throws SQLException{
-		getParentsFiles.setString(1, nameSpace);
-		ResultSet result = getParentsFiles.executeQuery();
+		getParentsFilesFromNameSpace.setString(1, nameSpace);
+		ResultSet result = getParentsFilesFromNameSpace.executeQuery();
 		
 		ArrayList resList = new ArrayList(5);
 		
-		File file = new File();
+		File file;
 		
 		while(result.next()){
+			file = new File();
 			file.setId(result.getInt(1));
 			file.setFileName(result.getString(2));
 			file.setId_folder_parent(result.getInt(3));
@@ -76,21 +82,104 @@ public class SpaceData {
 	}
 	
 	public ArrayList getDirectParentsFolders(String nameSpace) throws SQLException{
-		getParentsFolders.setString(1, nameSpace);
-		ResultSet result = getParentsFolders.executeQuery();
+		getParentsFoldersFromNameSpace.setString(1, nameSpace);
+		ResultSet result = getParentsFoldersFromNameSpace.executeQuery();
 		
 		ArrayList resList = new ArrayList(5);
 		
-		Folder folder = new Folder();
 		
+		Folder folder;
 		while(result.next()){
+			folder = new Folder();
 			folder.setId(result.getInt(1));
 			folder.setFolderName(result.getString(2));
-			folder.setId_folder_parent(result.getInt(3));
-			folder.setName_space_parent(result.getString(4));
+			folder.setName_space_parent(result.getString(3));
+			folder.setId_folder_parent(result.getInt(4));
+			resList.add(folder);
+		}
+		
+		return resList;
+	}
+	
+	public ArrayList getDirectParentsFiles(int idParent) throws SQLException{
+		getParentsFilesFromFolder.setInt(1, idParent);
+		ResultSet result = getParentsFilesFromFolder.executeQuery();
+		
+		ArrayList resList = new ArrayList(5);
+		
+		File file;
+		while(result.next()){
+			file = new File();
+			file.setId(result.getInt(1));
+			file.setFileName(result.getString(2));
+			file.setId_folder_parent(result.getInt(3));
+			file.setName_space_parent(result.getString(4));
+			resList.add(file);
+		}
+		return resList;
+	}
+	
+	public ArrayList getDirectParentsFolders(int idParent) throws SQLException{
+		getParentFoldersFromFile.setInt(1, idParent);
+		ResultSet result = getParentFoldersFromFile.executeQuery();
+		
+		ArrayList resList = new ArrayList(5);
+		
+		Folder folder;
+		while(result.next()){
+			folder = new Folder();
+			folder.setId(result.getInt(1));
+			folder.setFolderName(result.getString(2));
+			folder.setName_space_parent(result.getString(3));
+			folder.setId_folder_parent(result.getInt(4));
 			resList.add(folder);
 		}
 		return resList;
+	}
+	
+	// Return the id of the parent folder or nothing if the folder's parent is a space
+	public int getParentFolderId(int idFolder) throws SQLException{
+		getFolder.setInt(1, idFolder);
+		ResultSet result = getFolder.executeQuery();
+		
+		int idParent = 0;
+		
+		if(result.next()){
+			idParent = result.getInt(4);
+		}
+		
+		return idParent;
+		
+	}
+	
+	public String getFullPathfromFolder(int idFolder) throws SQLException{
+		String path = "";
+		getFolder.setInt(1, idFolder);
+		ResultSet result = getFolder.executeQuery();
+		
+		ArrayList foldersPath = new ArrayList(5);
+		
+		if(result.next()){
+			foldersPath.add(result.getString(2));
+			String nameSpace = result.getString(3);
+			int idFolderParent = result.getInt(4);
+			while(nameSpace == null){
+				getFolder.setInt(1, idFolderParent);
+				ResultSet result2 = getFolder.executeQuery();
+				result2.next();
+				foldersPath.add(result2.getString(2));
+				nameSpace = result2.getString(3);
+				idFolderParent = result2.getInt(4);
+			}
+			
+			path = path + nameSpace + "\\";
+			for(int i = foldersPath.size()-1; i>=0; i--){
+				path = path + foldersPath.get(i) + "\\";
+			}
+		}
+		
+		return path;
+		
 	}
 	
 	

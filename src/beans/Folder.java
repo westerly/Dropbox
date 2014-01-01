@@ -8,14 +8,13 @@ public class Folder implements java.io.Serializable {
 	 * 
 	 */
 	private static final long serialVersionUID = 8523527838115892735L;
-	private int id;
+	private Integer id;
 	private String folderName;
 	private String name_space_parent;
-	private int id_folder_parent;
+	private Integer id_folder_parent;
 	private Byte size;
 	private Integer numberOfFiles;
 	private Integer spaceId;
-	private Integer folderId;
 	private List<File> files = new LinkedList<File>();
 
 	public Folder() {
@@ -29,7 +28,7 @@ public class Folder implements java.io.Serializable {
 		this.size = size;
 		this.numberOfFiles = numberOfFiles;
 		this.spaceId = spaceId;
-		this.folderId = folderId;
+		this.id = folderId;
 		this.files = files;
 	}
 
@@ -97,7 +96,7 @@ public class Folder implements java.io.Serializable {
 	 * @return the folderId
 	 */
 	public Integer getFolderId() {
-		return folderId;
+		return id;
 	}
 
 	/**
@@ -105,7 +104,7 @@ public class Folder implements java.io.Serializable {
 	 *            the folderId to set
 	 */
 	public void setFolderId(Integer folderId) {
-		this.folderId = folderId;
+		this.id = folderId;
 	}
 
 	/**
@@ -132,7 +131,7 @@ public class Folder implements java.io.Serializable {
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
-		result = prime * result + folderId;
+		result = prime * result + id;
 		result = prime * result
 				+ ((folderName == null) ? 0 : folderName.hashCode());
 		result = prime * result + ((spaceId == null) ? 0 : spaceId.hashCode());
@@ -151,7 +150,7 @@ public class Folder implements java.io.Serializable {
 		if (getClass() != obj.getClass())
 			return false;
 		Folder other = (Folder) obj;
-		if (folderId != other.folderId)
+		if (id != other.id)
 			return false;
 		if (folderName == null) {
 			if (other.folderName != null)
@@ -175,14 +174,14 @@ public class Folder implements java.io.Serializable {
 	public String toString() {
 		return "Folder [folderName=" + folderName + ", size=" + size
 				+ ", numberOfFiles=" + numberOfFiles + ", spaceId=" + spaceId
-				+ ", folderId=" + folderId + ", files=" + files + "]";
+				+ ", folderId=" + id + ", files=" + files + "]";
 	}
 
 	public int getId() {
 		return id;
 	}
 
-	public void setId(int id) {
+	public void setId(Integer id) {
 		this.id = id;
 	}
 
@@ -194,11 +193,11 @@ public class Folder implements java.io.Serializable {
 		this.name_space_parent = name_space_parent;
 	}
 
-	public int getId_folder_parent() {
+	public Integer getId_folder_parent() {
 		return id_folder_parent;
 	}
 
-	public void setId_folder_parent(int id_folder_parent) {
+	public void setId_folder_parent(Integer id_folder_parent) {
 		this.id_folder_parent = id_folder_parent;
 	}
 
