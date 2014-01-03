@@ -68,4 +68,14 @@
     <servlet-name>Upload</servlet-name>
     <url-pattern>/Upload</url-pattern>
   </servlet-mapping>
+  <servlet>
+    <description></description>
+    <display-name>SearchEngine</display-name>
+    <servlet-name>SearchEngine</servlet-name>
+    <servlet-class>servlets.SearchEngine</servlet-class>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>SearchEngine</servlet-name>
+    <url-pattern>/SearchEngine</url-pattern>
+  </servlet-mapping>
 </web-app>
