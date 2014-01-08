@@ -91,7 +91,7 @@ public class Space extends HttpServlet {
 				e.printStackTrace();
 			}
 			
-			//resultFiles = Controler.getDirectParentsFoldersOfNameSpace(userCo.getNameSpace());
+			//restultFiles = Controler.getDirectParentsFoldersOfNameSpace(userCo.getNameSpace());
 			
 		}else{
 			// Return list of direct parents of the folder with the id set in parentFolderId

@@ -57,7 +57,7 @@ public class FileData {
 	}
 
 	public List<File> getFilesById(int id) throws Exception {
-		getFilesById.setInt(0, id);
+		getFilesById.setInt(1, id);
 		ResultSet result = getFilesById.executeQuery();
 		List<File> resultFiles = new LinkedList<File>();
 		while (result.next()) {

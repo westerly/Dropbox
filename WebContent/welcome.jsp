@@ -31,7 +31,7 @@
 	This is the welcome page.
 	<br /> You are connected with the login : ${sessionScope.user.login}
 	<!-- This line is used to test the searchEngine page -->
-<!-- <br /> <% response.sendRedirect("searchEngine.jsp"); %>  -->	
+	<%-- <% response.sendRedirect("searchEngine.jsp"); %> --%>
 	<br /> Here is your space:
 	<br />
 
