@@ -36,33 +36,8 @@
 	<br />
 
 	<jsp:include page="/Space"></jsp:include>
+	<jsp:include page="/folders.jsp"></jsp:include>
 
-	<%
-		ArrayList folders = (ArrayList) request.getAttribute("folders");
-		for (int i = 0; i < folders.size(); i++) {
-			Folder fold = (Folder) folders.get(i);
-	%>
-	<form method="post" action="./Folder">
-		<input type="hidden" name="parent"
-			value=<%if (request.getParameter("parentFolderId") != null) {
-					out.println(request.getParameter("parentFolderId"));
-				} else {
-					User userCo = (User) request.getSession().getAttribute(
-							"user");
-					out.println(userCo.getNameSpace());
-				}%> />
-		<input type="hidden" name="action" value="delete" /> <input
-			type="hidden" name="folderName"
-			value=<%out.println(fold.getFolderName());%> />
-		<%
-			out.println("<br/><a href=\"./welcome.jsp?parentFolderId="
-						+ fold.getId() + "\">" + fold.getFolderName() + "</a>");
-		%>
-		<input type="submit" value="Delete" />
-	</form>
-	<%
-		}
-	%>
 
 	<%
 		ArrayList files = (ArrayList) request.getAttribute("files");

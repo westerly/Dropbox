@@ -95,12 +95,12 @@ public class SpaceData {
 		return resList;
 	}
 
-	public ArrayList getDirectParentsFolders(String nameSpace)
+	public ArrayList<Folder> getDirectParentsFolders(String nameSpace)
 			throws SQLException {
 		getParentsFoldersFromNameSpace.setString(1, nameSpace);
 		ResultSet result = getParentsFoldersFromNameSpace.executeQuery();
 
-		ArrayList resList = new ArrayList(5);
+		ArrayList<Folder> resList = new ArrayList<Folder>(5);
 
 		Folder folder;
 		while (result.next()) {
@@ -133,11 +133,11 @@ public class SpaceData {
 		return resList;
 	}
 
-	public ArrayList getDirectParentsFolders(int idParent) throws SQLException {
+	public ArrayList<Folder> getDirectParentsFolders(int idParent) throws SQLException {
 		getParentFoldersFromFile.setInt(1, idParent);
 		ResultSet result = getParentFoldersFromFile.executeQuery();
 
-		ArrayList resList = new ArrayList(5);
+		ArrayList<Folder> resList = new ArrayList<Folder>(5);
 
 		Folder folder;
 		while (result.next()) {

@@ -3,6 +3,9 @@ package beans;
 import java.util.LinkedList;
 import java.util.List;
 
+import javax.xml.bind.annotation.XmlRootElement;
+
+@XmlRootElement
 public class File implements java.io.Serializable {
 	/**
 	 * 

@@ -3,11 +3,12 @@ package beans;
 
 import java.sql.*;
 import java.util.*;
+
 import Configuration.Configuration;
 
 public class UserData {
 	private Connection connection;
-	private PreparedStatement addRecord, getRecords, getUser, getNameSpace;
+	private PreparedStatement addRecord, getRecords, getUser, getUserByLoginAndPwd, getNameSpace;
 
 	public UserData() throws Exception {
 
@@ -24,6 +25,9 @@ public class UserData {
 			getUser = connection.prepareStatement("SELECT id, login, pwd from users WHERE login = ? ");
 			
 			getNameSpace = connection.prepareStatement("SELECT name from spaces WHERE owner = ? ");
+			
+			getUserByLoginAndPwd = connection.prepareStatement("SELECT id, login, pwd from users WHERE login = ? AND pwd = ?");
+			
 
 		} catch (SQLException sqle) {
 			sqle.printStackTrace();
@@ -86,6 +90,17 @@ public class UserData {
 			connection.close();
 		} catch (SQLException sqlException) {
 			sqlException.printStackTrace();
+		}
+	}
+	
+	public boolean isValidUser(User user) throws SQLException{
+		getUserByLoginAndPwd.setString(1, user.getLogin());
+		getUserByLoginAndPwd.setString(2, user.getPwd());
+		ResultSet result = getUserByLoginAndPwd.executeQuery();
+		if(result.next()){
+			return true;
+		}else{
+			return false;
 		}
 	}
 	
