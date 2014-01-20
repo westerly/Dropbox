@@ -75,12 +75,12 @@ public class SpaceData {
 		addRecord.executeUpdate();
 	}
 
-	public ArrayList getDirectParentsFiles(String nameSpace)
+	public ArrayList<File> getDirectParentsFiles(String nameSpace)
 			throws SQLException {
 		getParentsFilesFromNameSpace.setString(1, nameSpace);
 		ResultSet result = getParentsFilesFromNameSpace.executeQuery();
 
-		ArrayList resList = new ArrayList(5);
+		ArrayList<File> resList = new ArrayList<File>(5);
 
 		File file;
 
@@ -115,11 +115,11 @@ public class SpaceData {
 		return resList;
 	}
 
-	public ArrayList getDirectParentsFiles(int idParent) throws SQLException {
+	public ArrayList<File> getDirectParentsFiles(int idParent) throws SQLException {
 		getParentsFilesFromFolder.setInt(1, idParent);
 		ResultSet result = getParentsFilesFromFolder.executeQuery();
 
-		ArrayList resList = new ArrayList(5);
+		ArrayList<File> resList = new ArrayList<File>(5);
 
 		File file;
 		while (result.next()) {
@@ -172,7 +172,7 @@ public class SpaceData {
 		getFolder.setInt(1, idFolder);
 		ResultSet result = getFolder.executeQuery();
 
-		ArrayList foldersPath = new ArrayList(5);
+		ArrayList<String> foldersPath = new ArrayList<String>(5);
 
 		if (result.next()) {
 			foldersPath.add(result.getString(2));

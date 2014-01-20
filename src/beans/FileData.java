@@ -31,11 +31,11 @@ public class FileData {
 			getFilesByName = connection
 					.prepareStatement("SELECT * FROM  `files` WHERE  `name` LIKE ?");
 			getFilesByNameAndUser = connection
-					.prepareStatement("SELECT * FROM `files`, `users` WHERE FILES.name = ? AND USERS.login = ?");
+					.prepareStatement("SELECT * FROM `files`, `file_tag` WHERE FILES.name = ? AND USERS.login = ?");
 			getFilesById = connection
 					.prepareStatement("SELECT * FROM `files`, `users` WHERE FILES.id = ?");
 			getFilesByTag = connection
-					.prepareStatement("SELECT * FROM `file_tag` WHERE FILE_TAG.tagname LIKE ?");
+					.prepareStatement("SELECT * FROM `files`, `file_tag` WHERE FILE_TAG.tagname = ?");
 
 		} catch (SQLException sqle) {
 			sqle.printStackTrace();
@@ -43,14 +43,20 @@ public class FileData {
 	}
 
 	public List<File> getFilesByTag(String tag) throws Exception {
-		getFilesByTag.setString(0, tag);
+		getFilesByTag.setString(1, tag);
 		ResultSet result = getFilesByTag.executeQuery();
 		List<File> resultFiles = new LinkedList<File>();
+		System.out.println(getFilesByTag.toString());
+		File myFile;
 		while (result.next()) {
-			File myFile = new File();
+			myFile = new File();
 			myFile.setFileId(Integer.parseInt((result.getString(1))));
 			myFile.setFileName(result.getString(2));
-			myFile.setId_folder_parent(Integer.parseInt(result.getString(3)));
+			if (result.getString(3) == null) {
+				myFile.setId_folder_parent(null);
+			} else {
+				myFile.setId_folder_parent(Integer.parseInt(result.getString(3)));
+			}
 			myFile.setName_space_parent(result.getString(4));
 			resultFiles.add(myFile);
 		}
@@ -62,14 +68,20 @@ public class FileData {
 		getFilesById.setInt(1, id);
 		ResultSet result = getFilesById.executeQuery();
 		List<File> resultFiles = new LinkedList<File>();
+		File myFile;
 		while (result.next()) {
-			File myFile = new File();
+			myFile = new File();
 			myFile.setFileId(Integer.parseInt((result.getString(1))));
 			myFile.setFileName(result.getString(2));
-			myFile.setId_folder_parent(Integer.parseInt(result.getString(3)));
+			if (result.getString(3) == null) {
+				myFile.setId_folder_parent(null);
+			} else {
+				myFile.setId_folder_parent(Integer.parseInt(result.getString(3)));
+			}
 			myFile.setName_space_parent(result.getString(4));
 			resultFiles.add(myFile);
 		}
+
 		return resultFiles;
 
 	}
@@ -81,11 +93,8 @@ public class FileData {
 		ResultSet result = getFilesByNameAndUser.executeQuery();
 		System.out.println(getFilesByNameAndUser.toString());
 		List<File> resultFiles = new ArrayList<File>(5);
-		System.out.println("TEST1");
-		System.out.println(fileName + login);
 		File myFile;
 		while (result.next()) {
-			System.out.println("TEST2");
 			myFile = new File();
 			myFile.setFileId(Integer.parseInt((result.getString(1))));
 			myFile.setFileName(result.getString(2));
@@ -130,16 +139,24 @@ public class FileData {
 	public List<File> getUserFile(String login) throws SQLException {
 		getUserFiles.setString(1, login);
 		ResultSet result = getUserFiles.executeQuery();
+		System.out.println(getUserFiles.toString());
 		List<File> resultFiles = new ArrayList<File>(5);
 		File myFile;
 		while (result.next()) {
 			myFile = new File();
 			myFile.setFileId(Integer.parseInt((result.getString(1))));
 			myFile.setFileName(result.getString(2));
-			myFile.setId_folder_parent(Integer.parseInt(result.getString(3)));
+			if (result.getString(3) == null) {
+				myFile.setId_folder_parent(null);
+			} else {
+				myFile.setId_folder_parent(Integer.parseInt(result.getString(3)));
+
+			}
+
 			myFile.setName_space_parent(result.getString(4));
 			resultFiles.add(myFile);
 		}
+
 		return resultFiles;
 
 	}

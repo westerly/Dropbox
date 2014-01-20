@@ -42,15 +42,8 @@ public class services {
 	}
 
 	@GET
-	@Path("test/")
-	@Produces(MediaType.TEXT_HTML)
-	public static String test() {
-		return "<b> nameSpace </b>";
-	}
-
-	@GET
 	@Path("getFileById/{fileId}")
-	@Produces(MediaType.TEXT_PLAIN)
+	@Produces(MediaType.TEXT_XML)
 	public static List<beans.File> getFilesById(@PathParam("fileId") int fileId)
 			throws Exception {
 		FileData fileD = new FileData();
@@ -60,7 +53,7 @@ public class services {
 
 	@GET
 	@Path("getFileByTag/{tag}")
-	@Produces(MediaType.TEXT_PLAIN)
+	@Produces(MediaType.TEXT_XML)
 	public static List<beans.File> getFilesByTag(@PathParam("tag") String tag)
 			throws Exception {
 		FileData fileD = new FileData();
@@ -89,30 +82,32 @@ public class services {
 		return result;
 	}
 
+	
+	//No funciona
 	@GET
 	@Path("getUserFiles/{login}")
-	@Produces(MediaType.TEXT_PLAIN)
+	@Produces(MediaType.TEXT_XML)
 	public static String getUserFiles(@PathParam("login") String login)
 			throws Exception {
 		FileData fileD = new FileData();
-		List<beans.File> result = fileD.getFilesByName(login);
+		List<beans.File> result = fileD.getUserFile(login);
 		return result.toString();
 	}
 
 	@GET
 	@Path("getDirectFilesOfParentNameSpace/{nameSpace}")
-	@Produces(MediaType.TEXT_PLAIN)
-	public static String getDirectFilesOfParentNameSpace(
+	@Produces(MediaType.TEXT_XML)
+	public static ArrayList<beans.File> getDirectFilesOfParentNameSpace(
 			@PathParam("nameSpace") String nameSpace) throws Exception {
 		SpaceData spaceD = new SpaceData();
-		ArrayList result = spaceD.getDirectParentsFiles(nameSpace);
+		ArrayList<beans.File> result = spaceD.getDirectParentsFiles(nameSpace);
 		System.out.println(result);
-		return result.toString();
+		return result;
 	}
 
 	@GET
 	@Path("getDirectFoldersOfParentNameSpace/{nameSpace}")
-	@Produces(MediaType.TEXT_HTML)
+	@Produces(MediaType.TEXT_XML)
 	public static ArrayList<Folder> getDirectFoldersOfParentNameSpace(
 			@PathParam("nameSpace") String nameSpace) throws Exception {
 		SpaceData spaceD = new SpaceData();
@@ -122,17 +117,17 @@ public class services {
 
 	@GET
 	@Path("getDirectFilesOfParentFolder/{idParent}")
-	@Produces(MediaType.TEXT_HTML)
-	public static ArrayList<File> getDirectFilesOfParentFolder(
+	@Produces(MediaType.TEXT_XML)
+	public static ArrayList<beans.File> getDirectFilesOfParentFolder(
 			@PathParam("idParent") int idParent) throws Exception {
 		SpaceData spaceD = new SpaceData();
-		ArrayList<File> result = spaceD.getDirectParentsFiles(idParent);
+		ArrayList<beans.File> result = spaceD.getDirectParentsFiles(idParent);
 		return result;
 	}
 
 	@GET
 	@Path("getDirectFoldersOfParentFolder/{idParent}")
-	@Produces(MediaType.TEXT_HTML)
+	@Produces(MediaType.TEXT_XML)
 	public static ArrayList<Folder> getDirectFoldersOfParentFolder(
 			@PathParam("idParent") int idParent) throws Exception {
 		SpaceData spaceD = new SpaceData();
@@ -142,7 +137,7 @@ public class services {
 
 	@GET
 	@Path("getParentFolderId/{idParent}")
-	@Produces(MediaType.TEXT_HTML)
+	@Produces(MediaType.TEXT_XML)
 	public static int getParentFolderId(@PathParam("idFolder") int idFolder)
 			throws Exception {
 		SpaceData spaceD = new SpaceData();
@@ -285,14 +280,6 @@ public class services {
 		System.out.println("Controler" + file.getName_space_parent());
 		fileD.addFile(file);
 	}
-//	@GET
-//	@Path("getFile/{fileId}")
-//	@Produces(MediaType.TEXT_HTML)
-//	public String getFilesById(@PathParam("fileId") int fileId) throws Exception {
-//		FileData fileD = new FileData();
-//		List<beans.File> result = fileD.getFilesById(fileId);
-//		return "<b>" + result.get(1).getFileName() + "</b>";
-//	}
 	
 	@GET
 	@Path("getFoldersFromParentId/{parentId: .*}")
