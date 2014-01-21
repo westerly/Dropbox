@@ -114,7 +114,6 @@ public class services {
 		return true;
 	}
 
-	
 	@PUT
 	@Path("createFile/{fileName}/{parent}")
 	// Create file in the database
@@ -343,17 +342,48 @@ public class services {
 		}
 		return Response.ok("file path null").build();
 	}
-	
-	
+
 	@POST
 	@Path("changeFile")
-	@Consumes({"application/xml", "application/json"})
-	@Produces({"application/xml", "application/json"})
+	@Consumes({ "application/xml", "application/json" })
+	@Produces({ "application/xml", "application/json" })
 	public JaxBool changeFile(JaxBool JsonFile) throws Exception {
-		/*User userCo = (User) req.getSession().getAttribute("user");
-		UserData userD = new UserData();*/
+		/*
+		 * User userCo = (User) req.getSession().getAttribute("user"); UserData
+		 * userD = new UserData();
+		 */
 		System.out.println(JsonFile);
 		return JsonFile;
+	}
+
+	@GET
+	@Path("getParentsFoldersFromNameSpace/{nameSpace}")
+	@Produces(MediaType.TEXT_XML)
+	public ArrayList<Folder> getParentsFoldersFromNameSpace(
+			@PathParam("nameSpace") String nameSpace) throws Exception {
+		SpaceData spaceD = new SpaceData();
+		ArrayList<Folder> result = spaceD.getDirectParentsFolders(nameSpace);
+		return result;
+	}
+
+	@GET
+	@Path("getParentFoldersFromFile/{idParent}")
+	@Produces(MediaType.TEXT_XML)
+	public ArrayList<Folder> getParentFoldersFromFile(
+			@PathParam("idParent") int idParent) throws Exception {
+		SpaceData spaceD = new SpaceData();
+		ArrayList<Folder> result = spaceD.getDirectParentsFolders(idParent);
+		return result;
+	}
+
+	@GET
+	@Path("getFilesFromNamespaceParent/{nameSpace}")
+	@Produces(MediaType.TEXT_XML)
+	public ArrayList<beans.File> getFilesFromNamespaceParent(
+			@PathParam("nameSpace") String nameSpace) throws Exception {
+		ArrayList<beans.File> result = Controler
+				.getDirectFilesOfParentNameSpace(nameSpace);
+		return result;
 	}
 
 }

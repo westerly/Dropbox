@@ -240,5 +240,11 @@ public class Controler {
 		
 		return file;
 	}
+	public static ArrayList<Folder> getParentsFilesFromNameSpace(String nameSpace) throws Exception{
+		SpaceData spaceD = new SpaceData();
+		ArrayList<Folder> result = spaceD.getDirectParentsFolders(nameSpace);
+		return result;
+		
+	}
 
 }

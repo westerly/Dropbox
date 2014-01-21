@@ -32,6 +32,8 @@
 <body>
 
 	This is the welcome page.
+	<br />
+	<a href="./searchEngine.jsp" target="_blank">Search Engine</a>
 	<br /> You are connected with the login : ${sessionScope.user.login}
 	<!-- This line is used to test the searchEngine page -->
 	<%-- <% response.sendRedirect("searchEngine.jsp"); %> --%>

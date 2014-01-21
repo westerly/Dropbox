@@ -41,7 +41,7 @@ public class FileData {
 			getFilesByName = connection
 					.prepareStatement("SELECT * FROM  `files` WHERE  `name` LIKE ?");
 			getFilesByNameAndUser = connection
-					.prepareStatement("SELECT * FROM `files`, `file_tag` WHERE FILES.name = ? AND USERS.login = ?");
+					.prepareStatement("SELECT * FROM `files`, `users` WHERE FILES.name = ? AND USERS.login = ?");
 			getFilesById = connection
 					.prepareStatement("SELECT * FROM `files`, `users` WHERE FILES.id = ?");
 			getFilesByTag = connection

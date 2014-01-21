@@ -118,7 +118,7 @@ public class SpaceData {
 	public ArrayList<File> getDirectParentsFiles(int idParent) throws SQLException {
 		getParentsFilesFromFolder.setInt(1, idParent);
 		ResultSet result = getParentsFilesFromFolder.executeQuery();
-
+		System.out.println(getParentsFilesFromFolder.toString());
 		ArrayList<File> resList = new ArrayList<File>(5);
 
 		File file;
