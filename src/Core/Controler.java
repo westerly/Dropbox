@@ -43,38 +43,38 @@ public class Controler {
 		return result;
 	}
 
-	static public ArrayList getDirectFilesOfParentNameSpace(String nameSpace)
+	static public ArrayList<beans.File> getDirectFilesOfParentNameSpace(String nameSpace)
 			throws Exception {
 
 		SpaceData spaceD = new SpaceData();
-		ArrayList result = spaceD.getDirectParentsFiles(nameSpace);
+		ArrayList<beans.File> result = spaceD.getDirectParentsFiles(nameSpace);
 
 		return result;
 	}
 
-	static public ArrayList getDirectFoldersOfParentNameSpace(String nameSpace)
+	static public ArrayList<Folder> getDirectFoldersOfParentNameSpace(String nameSpace)
 			throws Exception {
 
 		SpaceData spaceD = new SpaceData();
-		ArrayList result = spaceD.getDirectParentsFolders(nameSpace);
+		ArrayList<Folder> result = spaceD.getDirectParentsFolders(nameSpace);
 
 		return result;
 	}
 
-	static public ArrayList getDirectFilesOfParentFolder(int idParent)
+	static public ArrayList<beans.File> getDirectFilesOfParentFolder(int idParent)
 			throws Exception {
 
 		SpaceData spaceD = new SpaceData();
-		ArrayList result = spaceD.getDirectParentsFiles(idParent);
+		ArrayList<beans.File> result = spaceD.getDirectParentsFiles(idParent);
 
 		return result;
 	}
 
-	static public ArrayList getDirectFoldersOfParentFolder(int idParent)
+	static public ArrayList<Folder> getDirectFoldersOfParentFolder(int idParent)
 			throws Exception {
 
 		SpaceData spaceD = new SpaceData();
-		ArrayList result = spaceD.getDirectParentsFolders(idParent);
+		ArrayList<Folder> result = spaceD.getDirectParentsFolders(idParent);
 
 		return result;
 	}
@@ -107,9 +107,9 @@ public class Controler {
 
 	}
 
-	// Create folder in DB and on the hard drive, return true if it successes
-	// and false otherwise
-	static public boolean createFolder(String folderName, String parent)
+	// Create folder in DB and on the hard drive, return the object Folder if it successes
+	// and null otherwise
+	static public Folder createFolder(String folderName, String parent)
 			throws Exception {
 		String path;
 		// The parent is a folder
@@ -125,7 +125,7 @@ public class Controler {
 		boolean success = (new File(path + folderName)).mkdirs();
 		if (!success) {
 			// Directory creation failed
-			return false;
+			return null;
 		} else {
 			Folder fold = new Folder();
 			fold.setFolderName(folderName);
@@ -139,11 +139,15 @@ public class Controler {
 			}
 
 			FolderData folderD = new FolderData();
-			folderD.addFolder(fold);
-
+			Integer folderId = folderD.addFolder(fold);
+			if(folderId != -1){
+				fold.setFolderId(folderId);
+				return fold;
+			}else{
+				return null;
+			}
+			
 		}
-
-		return true;
 	}
 
 	static public boolean isNumeric(String str) {
@@ -211,6 +215,28 @@ public class Controler {
 		}
 		System.out.println("Controler" + file.getName_space_parent());
 		fileD.addFile(file);
+	}
+	
+	// Delete file on the hard drive and on the database
+	static public void deleteFile(String fileName, String parent)
+			throws Exception {
+
+		String path;
+		// The parent is a folder
+		if (isNumeric(parent)) {
+			SpaceData spaceD = new SpaceData();
+			path = Configuration.DATA_FOLDER
+					+ spaceD.getFullPathfromFolder(Integer.parseInt(parent));
+		} else {
+			// The parent is a nameSpace
+			path = Configuration.DATA_FOLDER + parent + "\\";
+		}
+
+		delete(new File(path + fileName));
+		
+		FileData fileD = new FileData();
+		beans.File file = fileD.getFileFromParentAndName(fileName, parent);
+		fileD.deleteFile(file);
 	}
 
 }

@@ -16,8 +16,6 @@ public class File implements java.io.Serializable {
 	private Integer id_folder_parent;
 	private String name_space_parent;
 	private Byte size;
-	private Integer folderId;
-	private Integer fileId;
 	private List<String> tags = new LinkedList<String>();
 
 	public File() {
@@ -29,8 +27,8 @@ public class File implements java.io.Serializable {
 		super();
 		this.fileName = fileName;
 		this.size = size;
-		this.folderId = folderId;
-		this.fileId = fileId;
+		this.id_folder_parent = folderId;
+		this.Id = fileId;
 		this.tags = tags;
 	}
 
@@ -48,14 +46,6 @@ public class File implements java.io.Serializable {
 
 	public void setSize(Byte size) {
 		this.size = size;
-	}
-
-	public Integer getFolderId() {
-		return folderId;
-	}
-
-	public void setFolderId(Integer folderId) {
-		this.folderId = folderId;
 	}
 
 	public List<String> getTags() {
@@ -77,7 +67,7 @@ public class File implements java.io.Serializable {
 		int result = 1;
 		result = prime * result
 				+ ((fileName == null) ? 0 : fileName.hashCode());
-		result = prime * result + folderId;
+		result = prime * result + id_folder_parent;
 		return result;
 	}
 
@@ -103,7 +93,7 @@ public class File implements java.io.Serializable {
 		} else if (!fileName.equals(other.fileName)) {
 			return false;
 		}
-		if (folderId != other.folderId) {
+		if (id_folder_parent != other.id_folder_parent) {
 			return false;
 		}
 		return true;
@@ -112,23 +102,15 @@ public class File implements java.io.Serializable {
 	@Override
 	public String toString() {
 		return "File [fileName=" + fileName + ", size=" + size + ", folderId="
-				+ folderId + "]";
+				+ id_folder_parent + "]";
 	}
 
-	public Integer getFileId() {
-		return fileId;
-	}
-
-	public void setFileId(Integer fileId) {
-		this.fileId = fileId;
-	}
-
-	public int getId() {
+	public Integer getId() {
 		return Id;
 	}
 
-	public void setId(int id) {
-		Id = id;
+	public void setId(Integer fileId) {
+		this.Id = fileId;
 	}
 
 	public Integer getId_folder_parent() {

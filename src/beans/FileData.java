@@ -11,11 +11,13 @@ import java.util.LinkedList;
 import java.util.List;
 
 import Configuration.Configuration;
+import Core.Controler;
 
 public class FileData {
 	private Connection connection;
 	private PreparedStatement addRecord, getUserFiles, getFilesByName,
-			getFilesByNameAndUser, getFilesById, getFilesByTag;
+			getFilesByNameAndUser, getFilesById, getFilesByTag,
+			getFileFromParentAndName, deleteRecord;
 
 	public FileData() throws Exception {
 		try {
@@ -50,7 +52,7 @@ public class FileData {
 		File myFile;
 		while (result.next()) {
 			myFile = new File();
-			myFile.setFileId(Integer.parseInt((result.getString(1))));
+			myFile.setId(Integer.parseInt((result.getString(1))));
 			myFile.setFileName(result.getString(2));
 			if (result.getString(3) == null) {
 				myFile.setId_folder_parent(null);
@@ -71,7 +73,7 @@ public class FileData {
 		File myFile;
 		while (result.next()) {
 			myFile = new File();
-			myFile.setFileId(Integer.parseInt((result.getString(1))));
+			myFile.setId(Integer.parseInt((result.getString(1))));
 			myFile.setFileName(result.getString(2));
 			if (result.getString(3) == null) {
 				myFile.setId_folder_parent(null);
@@ -96,7 +98,7 @@ public class FileData {
 		File myFile;
 		while (result.next()) {
 			myFile = new File();
-			myFile.setFileId(Integer.parseInt((result.getString(1))));
+			myFile.setId(Integer.parseInt((result.getString(1))));
 			myFile.setFileName(result.getString(2));
 			if (result.getString(3) == null) {
 				myFile.setId_folder_parent(null);
@@ -120,7 +122,7 @@ public class FileData {
 		File myFile;
 		while (result.next()) {
 			myFile = new File();
-			myFile.setFileId(Integer.parseInt((result.getString(1))));
+			myFile.setId(Integer.parseInt((result.getString(1))));
 			myFile.setFileName(result.getString(2));
 
 			if (result.getString(3) == null) {
@@ -144,7 +146,7 @@ public class FileData {
 		File myFile;
 		while (result.next()) {
 			myFile = new File();
-			myFile.setFileId(Integer.parseInt((result.getString(1))));
+			myFile.setId(Integer.parseInt((result.getString(1))));
 			myFile.setFileName(result.getString(2));
 			if (result.getString(3) == null) {
 				myFile.setId_folder_parent(null);
@@ -182,5 +184,41 @@ public class FileData {
 
 		addRecord.executeUpdate();
 
+	}
+
+	public File getFileFromParentAndName(String folderName, String parent)
+			throws SQLException {
+
+		// parent is a folder
+		if (Controler.isNumeric(parent)) {
+			getFileFromParentAndName = connection
+					.prepareStatement("SELECT * FROM `files` WHERE name LIKE ? AND id_folder_parent = ?");
+
+			getFileFromParentAndName.setInt(2, Integer.parseInt(parent));
+		} else {
+			getFileFromParentAndName = connection
+					.prepareStatement("SELECT * FROM `files` WHERE name LIKE ? AND name_space_parent LIKE ?");
+			getFileFromParentAndName.setString(2, parent);
+		}
+
+		getFileFromParentAndName.setString(1, folderName);
+
+		ResultSet result = getFileFromParentAndName.executeQuery();
+
+		File myFile = null;
+		if (result.next()) {
+			myFile = new File();
+			myFile.setId(Integer.parseInt((result.getString(1))));
+			myFile.setFileName(result.getString(2));
+			myFile.setId_folder_parent(result.getInt(3));
+			myFile.setName_space_parent(result.getString(4));
+		}
+		System.out.println(myFile.toString());
+		return myFile;
+	}
+
+	public void deleteFile(File file) throws SQLException {
+		deleteRecord.setInt(1, file.getId());
+		deleteRecord.executeUpdate();
 	}
 }

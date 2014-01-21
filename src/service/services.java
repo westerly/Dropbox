@@ -1,6 +1,10 @@
 package service;
 
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -11,8 +15,11 @@ import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
+import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
+import javax.ws.rs.core.StreamingOutput;
 
 import Configuration.Configuration;
 import Core.Controler;
@@ -31,14 +38,6 @@ public class services {
 
 	public services() {
 
-	}
-
-	@GET
-	@Path("space/{nameSpace}")
-	@Produces(MediaType.TEXT_HTML)
-	public static String getUserSpaceHtml(
-			@PathParam("nameSpace") String nameSpace) {
-		return "<b>" + nameSpace + "</b>";
 	}
 
 	@GET
@@ -82,8 +81,6 @@ public class services {
 		return result;
 	}
 
-	
-	//No funciona
 	@GET
 	@Path("getUserFiles/{login}")
 	@Produces(MediaType.TEXT_XML)
@@ -95,47 +92,6 @@ public class services {
 	}
 
 	@GET
-	@Path("getDirectFilesOfParentNameSpace/{nameSpace}")
-	@Produces(MediaType.TEXT_XML)
-	public static ArrayList<beans.File> getDirectFilesOfParentNameSpace(
-			@PathParam("nameSpace") String nameSpace) throws Exception {
-		SpaceData spaceD = new SpaceData();
-		ArrayList<beans.File> result = spaceD.getDirectParentsFiles(nameSpace);
-		System.out.println(result);
-		return result;
-	}
-
-	@GET
-	@Path("getDirectFoldersOfParentNameSpace/{nameSpace}")
-	@Produces(MediaType.TEXT_XML)
-	public static ArrayList<Folder> getDirectFoldersOfParentNameSpace(
-			@PathParam("nameSpace") String nameSpace) throws Exception {
-		SpaceData spaceD = new SpaceData();
-		ArrayList<Folder> result = spaceD.getDirectParentsFolders(nameSpace);
-		return result;
-	}
-
-	@GET
-	@Path("getDirectFilesOfParentFolder/{idParent}")
-	@Produces(MediaType.TEXT_XML)
-	public static ArrayList<beans.File> getDirectFilesOfParentFolder(
-			@PathParam("idParent") int idParent) throws Exception {
-		SpaceData spaceD = new SpaceData();
-		ArrayList<beans.File> result = spaceD.getDirectParentsFiles(idParent);
-		return result;
-	}
-
-	@GET
-	@Path("getDirectFoldersOfParentFolder/{idParent}")
-	@Produces(MediaType.TEXT_XML)
-	public static ArrayList<Folder> getDirectFoldersOfParentFolder(
-			@PathParam("idParent") int idParent) throws Exception {
-		SpaceData spaceD = new SpaceData();
-		ArrayList<Folder> result = spaceD.getDirectParentsFolders(idParent);
-		return result;
-	}
-
-	@GET
 	@Path("getParentFolderId/{idParent}")
 	@Produces(MediaType.TEXT_XML)
 	public static int getParentFolderId(@PathParam("idFolder") int idFolder)
@@ -143,71 +99,6 @@ public class services {
 		SpaceData spaceD = new SpaceData();
 		int idParent = spaceD.getParentFolderId(idFolder);
 		return idParent;
-	}
-
-	@DELETE
-	@Path("deleteFolder/{folderName}/{parent}")
-	public static void deleteFolder(
-			@PathParam("folderName") String folderName,
-			@PathParam("parent") String parent) throws Exception {
-
-		String path;
-		// The parent is a folder
-		if (isNumeric(parent)) {
-			SpaceData spaceD = new SpaceData();
-			path = Configuration.DATA_FOLDER
-					+ spaceD.getFullPathfromFolder(Integer.parseInt(parent));
-		} else {
-			// The parent is a nameSpace
-			path = Configuration.DATA_FOLDER + parent + "\\";
-		}
-
-		delete(new File(path + folderName));
-
-		FolderData folderD = new FolderData();
-		Folder fold = folderD.getFolderFromName(folderName);
-		folderD.deleteFolder(fold);
-
-	}
-
-	@PUT
-	@Path("createFolder/{folderName}/{parent}")
-	public static boolean createFolder(
-			@PathParam("folderName") String folderName,
-			@PathParam("parent") String parent) throws Exception {
-		String path;
-		// The parent is a folder
-		if (isNumeric(parent)) {
-			SpaceData spaceD = new SpaceData();
-			path = Configuration.DATA_FOLDER
-					+ spaceD.getFullPathfromFolder(Integer.parseInt(parent));
-		} else {
-			// The parent is a nameSpace
-			path = Configuration.DATA_FOLDER + parent + "\\";
-		}
-
-		boolean success = (new File(path + folderName)).mkdirs();
-		if (!success) {
-			// Directory creation failed
-			return false;
-		} else {
-			Folder fold = new Folder();
-			fold.setFolderName(folderName);
-
-			if (isNumeric(parent)) {
-				fold.setId_folder_parent(Integer.parseInt(parent));
-				fold.setName_space_parent(null);
-			} else {
-				fold.setId_folder_parent(null);
-				fold.setName_space_parent(parent);
-			}
-
-			FolderData folderD = new FolderData();
-			folderD.addFolder(fold);
-
-		}
-
-		return true;
 	}
 
 	private static boolean isNumeric(String str) {
@@ -280,37 +171,116 @@ public class services {
 		System.out.println("Controler" + file.getName_space_parent());
 		fileD.addFile(file);
 	}
-	
+
+	@PUT
+	@Path("createFolder/{folderName}/{parent: .*}")
+	@Produces(MediaType.APPLICATION_JSON)
+	// Create folder at the location indicated by the param parent. If parent is
+	// equal to "" we create the folder in directly after the space name
+	// of the user in the tree, if parent is an id we create the folder after
+	// the folder with this id
+	// If folder created successfully we return the Folder object otherwise we
+	// return null
+	public Folder createFolder(@Context HttpServletRequest req,
+			@PathParam("folderName") String folderName,
+			@PathParam("parent") String parent) throws Exception {
+		User userCo = (User) req.getSession().getAttribute("user");
+		UserData userD = new UserData();
+		Folder fold = new Folder();
+		if (userD.isValidUser(userCo)) {
+
+			if (parent.equals("")) {
+				parent = userCo.getNameSpace();
+			} else {
+				if (!isNumeric(parent)) {
+					return null;
+				}
+			}
+			fold = Controler.createFolder(folderName, parent);
+
+		} else {
+			return null;
+		}
+
+		return fold;
+	}
+
+	// @GET
+	// @Path("getFile/{fileId}")
+	// @Produces(MediaType.TEXT_HTML)
+	// public String getFilesById(@PathParam("fileId") int fileId) throws
+	// Exception {
+	// FileData fileD = new FileData();
+	// List<beans.File> result = fileD.getFilesById(fileId);
+	// return "<b>" + result.get(1).getFileName() + "</b>";
+	// }
+
 	@GET
 	@Path("getFoldersFromParentId/{parentId: .*}")
 	@Produces(MediaType.TEXT_XML)
-	// Return direct parent folders of parent folder Id if it is not equal to "" and direct parent folders from name space parent
-	// if  parentId = ""
+	// Return direct parent folders of parent folder Id if it is not equal to ""
+	// and direct parent folders from name space parent
+	// if parentId = ""
 	// Return null if there is a problem
-	public ArrayList<Folder> getFoldersFromParentId(@Context HttpServletRequest req, @PathParam("parentId") String parentId) throws Exception {
-		User userCo = (User)req.getSession().getAttribute("user");
+	public ArrayList<Folder> getFoldersFromParentId(
+			@Context HttpServletRequest req,
+			@PathParam("parentId") String parentId) throws Exception {
+		User userCo = (User) req.getSession().getAttribute("user");
 		UserData userD = new UserData();
 		ArrayList<Folder> resultFolders;
-		if(userD.isValidUser(userCo)){
-			if(!parentId.equals("")){
-				resultFolders = Controler.getDirectFoldersOfParentFolder(Integer.parseInt(parentId));
-			}else{
-				resultFolders = Controler.getDirectFoldersOfParentNameSpace(userCo.getNameSpace());
+		if (userD.isValidUser(userCo)) {
+			if (!parentId.equals("")) {
+				resultFolders = Controler
+						.getDirectFoldersOfParentFolder(Integer
+								.parseInt(parentId));
+			} else {
+				resultFolders = Controler
+						.getDirectFoldersOfParentNameSpace(userCo
+								.getNameSpace());
 			}
-			return resultFolders; 
-		}else{
+			return resultFolders;
+		} else {
 			return null;
 		}
 	}
-	
+
+	@GET
+	@Path("getFilesFromParentId/{parentId: .*}")
+	@Produces(MediaType.TEXT_XML)
+	// Return direct parent files of parent file Id if it is not equal to "" and
+	// direct parent files from name space parent
+	// if parentId = ""
+	// Return null if there is a problem
+	public ArrayList<beans.File> getFilesFromParentId(
+			@Context HttpServletRequest req,
+			@PathParam("parentId") String parentId) throws Exception {
+		User userCo = (User) req.getSession().getAttribute("user");
+		UserData userD = new UserData();
+		ArrayList<beans.File> resultFiles;
+		if (userD.isValidUser(userCo)) {
+			if (!parentId.equals("")) {
+				resultFiles = Controler.getDirectFilesOfParentFolder(Integer
+						.parseInt(parentId));
+			} else {
+				resultFiles = Controler.getDirectFilesOfParentNameSpace(userCo
+						.getNameSpace());
+			}
+			return resultFiles;
+		} else {
+			return null;
+		}
+	}
+
 	@DELETE
-	@Path("deleteFolder/{folderName: .*}/{parent: .*}")
+	@Path("deleteFolder/{folderName}/{parent}")
 	@Produces(MediaType.APPLICATION_JSON)
-	public JaxBool deleteFolder(@Context HttpServletRequest req, @PathParam("folderName") String folderName, @PathParam("parent") String parent) throws Exception {
-		User userCo = (User)req.getSession().getAttribute("user");
+	public JaxBool deleteFolder(@Context HttpServletRequest req,
+			@PathParam("folderName") String folderName,
+			@PathParam("parent") String parent) throws Exception {
+		User userCo = (User) req.getSession().getAttribute("user");
 		UserData userD = new UserData();
 		JaxBool res = new JaxBool();
-		if(userD.isValidUser(userCo)){
+		if (userD.isValidUser(userCo)) {
 			try {
 				Controler.deleteFolder(folderName, parent);
 				res.setRes(true);
@@ -318,14 +288,101 @@ public class services {
 				res.setRes(false);
 				res.setError("Problem when we tried to delete the folder");
 				// TODO Auto-generated catch block
-				//e.printStackTrace();
+				// e.printStackTrace();
 			}
-		}else{
+		} else {
 			res.setRes(false);
 			res.setError("Problem when we tried to delete the folder");
 		}
-		
+
 		return res;
+	}
+
+	// Delete a folder son of the parent parameter which can be a namespace or a
+	// folder
+	@DELETE
+	@Path("deleteFile/{fileName}/{parent}")
+	@Produces(MediaType.APPLICATION_JSON)
+	public JaxBool deleteFile(@Context HttpServletRequest req,
+			@PathParam("fileName") String fileName,
+			@PathParam("parent") String parent) throws Exception {
+		User userCo = (User) req.getSession().getAttribute("user");
+		UserData userD = new UserData();
+		JaxBool res = new JaxBool();
+		if (userD.isValidUser(userCo)) {
+			try {
+				Controler.deleteFile(fileName, parent);
+				res.setRes(true);
+			} catch (Exception e) {
+				res.setRes(false);
+				res.setError("Problem when we tried to delete the file.");
+			}
+		} else {
+			res.setRes(false);
+			res.setError("Problem when we tried to delete the file.");
+		}
+
+		return res;
+	}
+
+	@GET
+	@Produces({ MediaType.APPLICATION_OCTET_STREAM })
+	@Path("/download/{folderName}/{parentId: .*}")
+	public Response downloadFile(@Context HttpServletRequest request,
+			@PathParam("folderName") String folderName,
+			@PathParam("parentId") String parent) throws Exception {
+		User userCo = (User) request.getSession().getAttribute("user");
+		UserData userD = new UserData();
+
+		if (!userD.isValidUser(userCo) || folderName.equals("")) {
+			return Response.ok("Invalid user or folder name parameter missing")
+					.build();
+		}
+
+		String filePath = "";
+		// the parent of the file is the namespace of the user
+		if (parent.equals("")) {
+			filePath = Configuration.DATA_FOLDER + userCo.getNameSpace() + "\\"
+					+ folderName;
+		} else {
+			SpaceData spaceD = new SpaceData();
+			filePath = Configuration.DATA_FOLDER
+					+ spaceD.getFullPathfromFolder(Integer.parseInt(parent))
+					+ "\\" + folderName;
+		}
+
+		System.out.println(filePath);
+
+		if (filePath != null && !"".equals(filePath)) {
+			File file = new File(filePath);
+			StreamingOutput stream = null;
+			try {
+				final InputStream in = new FileInputStream(file);
+				stream = new StreamingOutput() {
+					public void write(OutputStream out)
+							throws WebApplicationException {
+						try {
+							int read = 0;
+							byte[] bytes = new byte[1024];
+
+							while ((read = in.read(bytes)) != -1) {
+								out.write(bytes, 0, read);
+							}
+						} catch (Exception e) {
+							throw new WebApplicationException(e);
+						}
+					}
+				};
+			} catch (FileNotFoundException e) {
+				e.printStackTrace();
+			}
+
+			return Response
+					.ok(stream)
+					.header("content-disposition",
+							"attachment; filename = " + file.getName()).build();
+		}
+		return Response.ok("file path null").build();
 	}
 
 }

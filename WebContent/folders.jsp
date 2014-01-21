@@ -1,10 +1,7 @@
 <%@ page language="java" contentType="text/html; charset=ISO-8859-1"
     pageEncoding="ISO-8859-1"%>
     
-<%@ page import="java.util.ArrayList"%>
-<%@ page import="beans.Folder"%>
 <%@ page import="beans.User"%>
-<script type="text/javascript" src="jquery-1.10.2.min.js"></script>
 
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <html>
@@ -17,9 +14,11 @@
 		
 	</div>
 	
-	<div id="errorMessage">
+	<div id="errorMessageFolder">
 	
 	</div>
+	
+	New folder : <input type="text" name="folderName" /> <input type="button" id="createFolder" value="Create" />
 	
 	<script>
 	
@@ -64,13 +63,13 @@
 		        		console.log(window.foldername);
 		        		var $html = "<p id=\""+folderName+"\"><a href=\"./welcome.jsp?parentFolderId="
 							+ $(this).find("folderId").text() + "\">" + folderName + "</a>";
-						$html += "<input type=\"button\" value=\"Delete\" name=\"" + folderName + "\"></p>";
+						$html += "<input type=\"button\" class=\"folderButton\" value=\"Delete\" name=\"" + folderName + "\"></p>";
 						$("#folder").append($html);
 			
 		        	});
 		        	
 		        	
-	    			$( ":button" ).click(function() {
+	    			$( ".folderButton" ).click(function() {
 	    				  //console.log($(this).get(0).name);
 						  
 						  params = getURLParameters(currentUrl);
@@ -94,53 +93,44 @@
 						        	if(res["res"] == "true"){
 						        		$("#"+folderNameClicked).remove();
 						        	}else{
-						        		$("#errorMessage").append(res["error"]);
+						        		$("#errorMessageFolder").append(res["error"]);
 						        	}
 						        }
 						  });      	
-						      
-						  
-						  //console.log(parent);
 						  
 	    			});
-		    	
-		        	
+	    			
 	        	}else{
 	        		$("#folder").append("<p>Problem when we tried to load your folders.</p>");
 	        	}
 	        }
 	    }
-	  );  
-	
+	  );
+		
+	$( "#createFolder" ).click(function() {
+		
+		$.ajax( {
+	        type: "PUT",
+	        url: "services/service/createFolder/" + $( "input[name='folderName']" ).val() + "/" + parentFolderId,
+	        dataType: "JSON",
+	        success: function(fold) { 
+	        	console.log(fold);
+	        	if(fold != null){
+	        		var folderName = $( "input[name='folderName']" ).val();
+	        		var $html = "<p id=\""+folderName+"\"><a href=\"./welcome.jsp?parentFolderId="
+					+ fold["folderId"] + "\">" + folderName + "</a>";
+					$html += "<input type=\"button\" class=\"folderButton\" value=\"Delete\" name=\"" + folderName + "\"></p>";
+	        		$("#folder").append($html);
+	        	}else{
+	        		$("#errorMessageFolder").append("Problem when we tried to create your folder.");
+	        	}
+	        }
+		});
+	});
+		
 	
 	</script>
-
-	<%-- <%
-		ArrayList<Folder> folders = (ArrayList) request.getAttribute("folders");
-		for (int i = 0; i < folders.size(); i++) {
-			Folder fold = (Folder) folders.get(i);
-	%>
-	<form method="post" action="./Folder">
-		<input type="hidden" name="parent"
-			value=<%if (request.getParameter("parentFolderId") != null) {
-					out.println(request.getParameter("parentFolderId"));
-				} else {
-					User userCo = (User) request.getSession().getAttribute(
-							"user");
-					out.println(userCo.getNameSpace());
-				}%> />
-		<input type="hidden" name="action" value="delete" /> <input
-			type="hidden" name="folderName"
-			value=<%out.println(fold.getFolderName());%> />
-		<%
-			out.println("<br/><a href=\"./welcome.jsp?parentFolderId="
-						+ fold.getId() + "\">" + fold.getFolderName() + "</a>");
-		%>
-		<input type="submit" value="Delete" />
-	</form>
-	<%
-		}
-	%> --%>
+	
 
 </body>
 </html>

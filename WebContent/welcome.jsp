@@ -18,6 +18,9 @@
 <%@ page import="beans.Folder"%>
 <%@ page import="Core.Controler"%>
 <%@ page import="beans.User"%>
+<%@ page import="java.util.ArrayList"%>
+<%@ page import="beans.Folder"%>
+<script type="text/javascript" src="jquery-1.10.2.min.js"></script>
 
 
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
@@ -37,15 +40,8 @@
 
 	<jsp:include page="/Space"></jsp:include>
 	<jsp:include page="/folders.jsp"></jsp:include>
+	<jsp:include page="/files.jsp"></jsp:include>
 
-
-	<%
-		ArrayList files = (ArrayList) request.getAttribute("files");
-		for (int i = 0; i < files.size(); i++) {
-			File f = (File) files.get(i);
-			out.println("<br/>" + f.getFileName());
-		}
-	%>
 
 	<%
 		if (request.getParameter("parentFolderId") != null) {
@@ -59,18 +55,6 @@
 			}
 		}
 	%>
-
-	<form method="post" action="./Folder">
-		<input type="hidden" name="parent"
-			value=<%if (request.getParameter("parentFolderId") != null) {
-				out.println(request.getParameter("parentFolderId"));
-			} else {
-				User userCo = (User) request.getSession().getAttribute("user");
-				out.println(userCo.getNameSpace());
-			}%> />
-		<input type="hidden" name="action" value="create" /> New folder : <input
-			type="text" name="folderName" /> <input type="submit" value="Create" />
-	</form>
 
 
 	<%
