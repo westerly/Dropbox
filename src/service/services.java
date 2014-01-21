@@ -9,8 +9,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
+import javax.ws.rs.FormParam;
 import javax.ws.rs.GET;
+import javax.ws.rs.POST;
 import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
@@ -84,11 +87,11 @@ public class services {
 	@GET
 	@Path("getUserFiles/{login}")
 	@Produces(MediaType.TEXT_XML)
-	public static String getUserFiles(@PathParam("login") String login)
+	public static List<beans.File> getUserFiles(@PathParam("login") String login)
 			throws Exception {
 		FileData fileD = new FileData();
 		List<beans.File> result = fileD.getUserFile(login);
-		return result.toString();
+		return result;
 	}
 
 	@GET
@@ -111,47 +114,7 @@ public class services {
 		return true;
 	}
 
-	@DELETE
-	@Path("deleteFile/{file}")
-	public static void delete(@PathParam("file") File file) {
-
-		if (file.isDirectory()) {
-
-			// directory is empty, then delete it
-			if (file.list().length == 0) {
-
-				file.delete();
-				System.out.println("Directory is deleted : "
-						+ file.getAbsolutePath());
-
-			} else {
-
-				// list all the directory contents
-				String files[] = file.list();
-
-				for (String temp : files) {
-					// construct the file structure
-					File fileDelete = new File(file, temp);
-
-					// recursive delete
-					delete(fileDelete);
-				}
-
-				// check the directory again, if empty then delete it
-				if (file.list().length == 0) {
-					file.delete();
-					System.out.println("Directory is deleted : "
-							+ file.getAbsolutePath());
-				}
-			}
-
-		} else {
-			// if file, then delete it
-			file.delete();
-			System.out.println("File is deleted : " + file.getAbsolutePath());
-		}
-	}
-
+	
 	@PUT
 	@Path("createFile/{fileName}/{parent}")
 	// Create file in the database
@@ -299,11 +262,11 @@ public class services {
 	}
 
 	// Delete a folder son of the parent parameter which can be a namespace or a
-	// folder
+	// folder, return the File deleted if success or null otherwise
 	@DELETE
 	@Path("deleteFile/{fileName}/{parent}")
 	@Produces(MediaType.APPLICATION_JSON)
-	public JaxBool deleteFile(@Context HttpServletRequest req,
+	public beans.File deleteFile(@Context HttpServletRequest req,
 			@PathParam("fileName") String fileName,
 			@PathParam("parent") String parent) throws Exception {
 		User userCo = (User) req.getSession().getAttribute("user");
@@ -311,18 +274,14 @@ public class services {
 		JaxBool res = new JaxBool();
 		if (userD.isValidUser(userCo)) {
 			try {
-				Controler.deleteFile(fileName, parent);
-				res.setRes(true);
+				beans.File file = Controler.deleteFile(fileName, parent);
+				return file;
 			} catch (Exception e) {
-				res.setRes(false);
-				res.setError("Problem when we tried to delete the file.");
+				return null;
 			}
 		} else {
-			res.setRes(false);
-			res.setError("Problem when we tried to delete the file.");
+			return null;
 		}
-
-		return res;
 	}
 
 	@GET
@@ -383,6 +342,18 @@ public class services {
 							"attachment; filename = " + file.getName()).build();
 		}
 		return Response.ok("file path null").build();
+	}
+	
+	
+	@POST
+	@Path("changeFile")
+	@Consumes({"application/xml", "application/json"})
+	@Produces({"application/xml", "application/json"})
+	public JaxBool changeFile(JaxBool JsonFile) throws Exception {
+		/*User userCo = (User) req.getSession().getAttribute("user");
+		UserData userD = new UserData();*/
+		System.out.println(JsonFile);
+		return JsonFile;
 	}
 
 }

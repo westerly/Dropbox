@@ -60,10 +60,13 @@
 	        	console.log(xml);
 	        	if(xml != null){
 		        	$(xml).find('file').each( function(){
+		        		console.log(xml);
 		        		fileName = $(this).find("fileName").text();
-		        		var $html = "<p id=\""+fileName+"\">" + fileName;
+		        		var fileId = $(this).find("id").text();
+		        		var $html = "<p id=\""+fileId+"\">" + fileName;
 		        		$html += "  <input type=\"button\" class=\"fileButtonDownload\" value=\"Download\" name=\"" + fileName + "\">";
 		        		$html += "  <input type=\"button\" class=\"fileButtonDelete\" value=\"Delete\" name=\"" + fileName + "\"></p>";
+		        		//$html += "  <input type=\"button\" class=\"fileButtonChange\" value=\"Modify\" name=\"" + fileId + "\"></p>";
 						$("#file").append($html);
 		        	});
 		        	
@@ -94,7 +97,6 @@
 		    				  User userCo = (User) request.getSession().getAttribute("user");
 		    				  %>
 							  parent = <%out.println("\"" + userCo.getNameSpace() + "\"");%>
-							  //console.log(namespace);
 						  }else{
 							  parent = params["parentFolderId"];
 						  }
@@ -104,16 +106,50 @@
 						        type: "DELETE",
 						        url: "services/service/deleteFile/" + fileNameClicked + "/" + parent,
 						        dataType: "JSON",
-						        success: function(res) { 
-						        	if(res["res"] == "true"){
-						        		$("#"+fileNameClicked).remove();
+						        success: function(file) { 
+						        	if(file != null){
+						        		$("#"+file["Id"]).remove();
 						        	}else{
-						        		$("#errorMessageFile").append(res["error"]);
+						        		$("#errorMessageFile").append("Problem when we tried to remove your file.");
 						        	}
 						        }
 						  });      	
 						  
 	    			});
+		        	
+		        	$( ".fileButtonChange" ).click(function() {
+		        	/* 	var JsonFile = {"Id":$(this).get(0).name,
+		        						"fileName":"test",
+		        						"id_folder_parent":"",
+		        						"name_space_parent":"",
+		        						"size":""
+		        						}; */
+		        		
+		        		var JsonFile = {"res":"true",
+        								"error":"test"
+        						};
+						
+		        		console.log($(this).get(0).name);
+		        		//var jsonData = JSON.parse( JSONObject );
+		        		
+			        	$.ajax({ url: "services/service/changeFile", 
+		        			 type: "POST", 
+		        			 contentType: 'application/json', // type of data
+		        			 //data: JSON.stringify(JsonFile), // make JSON string
+		        			 data: '<?xml version="1.0" encoding="UTF-8"?><JaxBool><res>true</res><error>Erreur de merde</error></JaxBool>',
+		        			 dataType: "application/xml",
+		        			 success: function(file){ 
+		        				
+		        				console.log(file);
+					        	/* if(file != null){
+					        		$("#"+file["id"]).remove();
+					        	}else{
+					        		$("#errorMessageFile").append("Problem when we tried to remove your file.");
+					        	} */
+						     }
+			        	});
+		        	});
+		        	
 		        	
 	        	}else{
 	        		$("#file").append("<p>Problem when we tried to load your files.</p>");

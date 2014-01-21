@@ -28,8 +28,16 @@ public class FileData {
 			addRecord = connection
 					.prepareStatement("INSERT INTO files (name, name_space_parent, id_folder_parent) "
 							+ "VALUES (?, ?, ?)");
+			
+			deleteRecord = connection
+					.prepareStatement("DELETE FROM files WHERE id = ?");
+			
+			
 			getUserFiles = connection
-					.prepareStatement("SELECT FILES.id, FILES.name, FILES.id_folder_parent, FILES.name_space_parent FROM `FILES`, `SPACES`, `USERS` WHERE FILES.name_space_parent = SPACES.name and SPACES.owner = USERS.id and USERS.id = ? ");
+					.prepareStatement("SELECT FILES.id, FILES.name, FILES.id_folder_parent, " +
+					"FILES.name_space_parent FROM `FILES`, `SPACES`, `USERS` WHERE FILES.name_space_parent = SPACES.name " +
+					"and SPACES.owner = USERS.id and USERS.login = ? ");
+			
 			getFilesByName = connection
 					.prepareStatement("SELECT * FROM  `files` WHERE  `name` LIKE ?");
 			getFilesByNameAndUser = connection
@@ -205,7 +213,7 @@ public class FileData {
 
 		ResultSet result = getFileFromParentAndName.executeQuery();
 
-		File myFile = null;
+		beans.File myFile = null;
 		if (result.next()) {
 			myFile = new File();
 			myFile.setId(Integer.parseInt((result.getString(1))));
@@ -213,7 +221,7 @@ public class FileData {
 			myFile.setId_folder_parent(result.getInt(3));
 			myFile.setName_space_parent(result.getString(4));
 		}
-		System.out.println(myFile.toString());
+		
 		return myFile;
 	}
 

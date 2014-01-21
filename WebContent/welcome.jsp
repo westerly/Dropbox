@@ -69,23 +69,6 @@
 		}
 	%>
 
-	<!-- 	 <form name="add-by-file" enctype="multipart/form-data" method="post" action="./Upload" target="target_upload">
-	    <input type="file" name="file"/>
-	    <input type="submit" value="Upload"/>
-	</form>
-	
-	<iframe id="target_upload" name="target_upload" src=""></iframe>
-	
-	<script type="text/javascript">
-		var terminateFileUpload = function() {
-			// on récupère le contenu du fichier et on retourne un deck
-			Account.generateDeckFromUploadFile({
-				callback: function(deck) {
-					document.write("File uploaded");
-				}
-			});
-		}
-	</script> -->
 
 	<%
 		if (request.getParameter("parentFolderId") != null) {
@@ -104,21 +87,14 @@
 
 			<p>
 				<br /> Choose a file to upload to the server: <input name="myFile"
-					type="file" /><br />
-				<%--    <%
-        	if(request.getParameter("parentFolderId") != null){
-        %>
-        	<input type="hidden" name="parentFolderId" value="<%out.println(request.getParameter("parentFolderId"));%>"/>
-        <%
-        	}
-        %> --%>
+					type="file" />
+					<input type="submit" /> 
+					<br />
+		
 			</p>
 
 			<hr />
 
-			<p>
-				<input type="submit" /> <input type="reset" />
-			</p>
 		</form>
 </body>
 </html>

@@ -218,7 +218,7 @@ public class Controler {
 	}
 	
 	// Delete file on the hard drive and on the database
-	static public void deleteFile(String fileName, String parent)
+	static public beans.File deleteFile(String fileName, String parent)
 			throws Exception {
 
 		String path;
@@ -237,6 +237,8 @@ public class Controler {
 		FileData fileD = new FileData();
 		beans.File file = fileD.getFileFromParentAndName(fileName, parent);
 		fileD.deleteFile(file);
+		
+		return file;
 	}
 
 }

@@ -3,20 +3,24 @@ package beans;
 import java.util.LinkedList;
 import java.util.List;
 
+import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
+import javax.xml.bind.annotation.XmlType;
 
 @XmlRootElement
+@XmlAccessorType(XmlAccessType.FIELD)
 public class File implements java.io.Serializable {
 	/**
 	 * 
 	 */
-	private static final long serialVersionUID = -529994213106061035L;
-	private int Id;
-	private String fileName;
-	private Integer id_folder_parent;
-	private String name_space_parent;
-	private Byte size;
-	private List<String> tags = new LinkedList<String>();
+	//private static final long serialVersionUID = -529994213106061035L;
+	@XmlElement private int Id;
+	@XmlElement private String fileName;
+	@XmlElement private Integer id_folder_parent;
+	@XmlElement private String name_space_parent;
+	@XmlElement private Byte size;
 
 	public File() {
 		super();
@@ -29,7 +33,6 @@ public class File implements java.io.Serializable {
 		this.size = size;
 		this.id_folder_parent = folderId;
 		this.Id = fileId;
-		this.tags = tags;
 	}
 
 	public String getFileName() {
@@ -46,14 +49,6 @@ public class File implements java.io.Serializable {
 
 	public void setSize(Byte size) {
 		this.size = size;
-	}
-
-	public List<String> getTags() {
-		return tags;
-	}
-
-	public void setTags(List<String> tags) {
-		this.tags = tags;
 	}
 
 	/*
